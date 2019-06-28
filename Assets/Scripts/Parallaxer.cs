@@ -12,7 +12,7 @@ public class Parallaxer : MonoBehaviour
             transform = t;
         }
         public void Use() { inUse = true; }
-         public void Dispose() { inUse = false; }
+        public void Dispose() { inUse = false; }
     }
 
     [System.Serializable]
@@ -51,7 +51,7 @@ public class Parallaxer : MonoBehaviour
     void onGameOver(){
         for(int i = 0; i < poolObjects.Length; i++){
             poolObjects[i].Dispose();
-            poolObject.transform.position = Vector3.one * 2000;  //Way off screen
+            poolObjects[i].transform.position = Vector3.one * 1000;  //Way off screen
         }
         if(spawnImmediate){
             SpawnImmediate();
@@ -61,7 +61,7 @@ public class Parallaxer : MonoBehaviour
         if(game.GameOver) return;
 
         Shift();
-        spawnTimer += spawnTimer.deltaTime;
+        spawnTimer += Time.deltaTime;
         if(spawnTimer > spawnRate){
             Spawn();
             spawnTimer = 0;
@@ -74,7 +74,7 @@ public class Parallaxer : MonoBehaviour
             GameObject go = Instantiate(Prefab) as GameObject;
             Transform t = go.transform;
             t.SetParent(transform);
-            t.position = Vector3.one * 2000;
+            t.position = Vector3.one * 1000;
             poolObjects[i] = new PoolObject(t);
         }
         if(spawnImmediate){
@@ -85,29 +85,29 @@ public class Parallaxer : MonoBehaviour
         Transform t = GetPoolObject();
         if(t == null) return; //Pool Size too small
         Vector3 pos = Vector3.zero;
-        pos.x = defaultSpawnPos.x;
+        pos.x = (defaultSpawnPos.x * Camera.main.aspect) / targetAspect;
         pos.y = Random.Range(ySpawnRange.min, ySpawnRange.max);
         t.position = pos;
     }
     void SpawnImmediate(){
-         Transform t = GetPoolObject();
+        Transform t = GetPoolObject();
         if(t == null) return; //Pool Size too small
         Vector3 pos = Vector3.zero;
-        pos.x = immediateSpawnPos.x;
+        pos.x = (immediateSpawnPos.x * Camera.main.aspect) / targetAspect;
         pos.y = Random.Range(ySpawnRange.min, ySpawnRange.max);
         t.position = pos;
         Spawn();
     }
     void Shift(){
         for(int i = 0; i < poolObjects.Length; i++){
-            poolObjects[i].transform.position += Vector3.right * shiftSpeed * Time.deltaTime;
+            poolObjects[i].transform.localPosition += -Vector3.right * shiftSpeed * Time.deltaTime;
             CheckDisposeObject(poolObjects[i]);
         }
     }
     void CheckDisposeObject(PoolObject poolObject){
-        if(poolObject.transform.position.x < -defaultSpawnPos.x){
+        if(poolObject.transform.position.x < (-defaultSpawnPos.x * Camera.main.aspect) / targetAspect){
             poolObject.Dispose();
-            poolObject.transform.position = Vector3.one * 2000;  //Way off screen
+            poolObject.transform.position = Vector3.one * 1000;  //Way off screen
         }
 
     }

@@ -28,6 +28,10 @@ public class GameManager : MonoBehaviour
         get { return gameOver; }
     }
 
+    public int Score{
+        get { return score; }
+    }
+
     void Awake(){
         Instance = this;
     }
